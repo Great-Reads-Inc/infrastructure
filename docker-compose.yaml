@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  api:
+    build:
+      context: ../great-reads-api
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      - ../great-reads-api:/app
+    env_file:
+      - ../great-reads-api/.env # Assuming a .env file for API environment variables
+    depends_on:
+      - db
+
+  client:
+    build:
+      context: ../great-reads-client
+      dockerfile: Dockerfile
+    ports:
+      - "5173:5173"
+    volumes:
+      - ../great-reads-client:/app
+    env_file:
+      - ../great-reads-client/.env # Assuming a .env file for Client environment variables
+    depends_on:
+      - api
+
+  db:
+    image: postgres:13-alpine
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: greatreads
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+
+volumes:
+  db_data:
